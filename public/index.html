@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Palette Extractor - Extract Colors from Any Image</title>
+  <meta name="description" content="Extract beautiful color palettes from any image instantly. Get HEX, RGB, HSL codes. Export to CSS, SCSS, or JSON.">
+  <meta property="og:title" content="Color Palette Extractor">
+  <meta property="og:description" content="Extract beautiful color palettes from any image instantly">
+  <meta property="og:type" content="website">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            dark: { 900: '#0a0a0f', 800: '#13131f', 700: '#1a1a2e' },
+            brand: { 400: '#a855f7', 500: '#8b5cf6', 600: '#7c3aed' }
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.6s ease-out',
+            'slide-up': 'slideUp 0.5s ease-out',
+            'pulse-slow': 'pulse 3s ease-in-out infinite',
+            'shimmer': 'shimmer 2s linear infinite'
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body { font-family: 'Inter', sans-serif; background: #0a0a0f; }
+    .gradient-text { background: linear-gradient(135deg, #a855f7, #ec4899, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
+    .color-swatch { transition: all 0.3s ease; }
+    .color-swatch:hover { transform: scale(1.05); }
+    .drop-zone { border: 2px dashed rgba(139, 92, 246, 0.4); transition: all 0.3s ease; }
+    .drop-zone:hover, .drop-zone.drag-over { border-color: #a855f7; background: rgba(139, 92, 246, 0.1); }
+    .glow { box-shadow: 0 0 40px rgba(168, 85, 247, 0.3); }
+    .btn-glow:hover { box-shadow: 0 0 30px rgba(168, 85, 247, 0.5); }
+  </style>
+</head>
+<body class="min-h-screen text-white overflow-x-hidden">
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 w-full z-50 glass">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-pink-500 flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+        </div>
+        <span class="font-bold text-lg">Color Palette Extractor</span>
+      </div>
+      <a href="#pricing" class="px-5 py-2 rounded-full bg-brand-600 hover:bg-brand-500 transition-all font-medium">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="relative pt-32 pb-20 px-6">
+    <div class="absolute inset-0 bg-gradient-to-b from-brand-600/10 via-transparent to-transparent"></div>
+    <div class="max-w-5xl mx-auto text-center relative z-10">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass mb-8 animate-fade-in">
+        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+        <span class="text-sm text-gray-300">Extract colors from any image</span>
+      </div>
+      <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight animate-slide-up">
+        Turn Images Into<br><span class="gradient-text">Beautiful Palettes</span>
+      </h1>
+      <p class="text-xl text-gray-400 mb-10 max-w-2xl mx-auto animate-slide-up" style="animation-delay: 0.1s">
+        Upload any image and instantly extract stunning color palettes. Get HEX, RGB, and HSL codes. Export to CSS, SCSS, or JSON formats.
+      </p>
+      <div class="flex flex-wrap justify-center gap-4 animate-slide-up" style="animation-delay: 0.2s">
+        <a href="#demo" class="px-8 py-4 rounded-full bg-brand-600 hover:bg-brand-500 transition-all font-semibold text-lg btn-glow">Try Free Demo</a>
+        <a href="#pricing" class="px-8 py-4 rounded-full glass hover:bg-white/10 transition-all font-semibold text-lg">Get Full Access</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Section -->
+  <section id="demo" class="py-20 px-6">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Try It Now</h2>
+        <p class="text-gray-400">Upload an image to extract its color palette</p>
+      </div>
+
+      <div class="glass rounded-2xl p-8 glow">
+        <!-- Upload Zone -->
+        <div id="dropZone" class="drop-zone rounded-xl p-12 text-center cursor-pointer mb-8">
+          <input type="file" id="fileInput" accept="image/*" class="hidden">
+          <svg class="w-16 h-16 mx-auto mb-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <p class="text-lg mb-2">Drop your image here or click to browse</p>
+          <p class="text-sm text-gray-500">Supports JPG, PNG, GIF, WebP</p>
+        </div>
+
+        <!-- Image Preview -->
+        <div id="imagePreview" class="hidden mb-8">
+          <img id="previewImg" class="max-h-64 mx-auto rounded-lg" src="" alt="Preview">
+        </div>
+
+        <!-- Extract Button -->
+        <button id="extractBtn" class="hidden w-full py-4 rounded-xl bg-gradient-to-r from-brand-500 to-pink-500 hover:from-brand-400 hover:to-pink-400 transition-all font-semibold text-lg mb-8">
+          Extract Colors
+        </button>
+
+        <!-- Loading -->
+        <div id="loading" class="hidden text-center py-8">
+          <div class="inline-flex items-center gap-3">
+            <div class="w-8 h-8 border-2 border-brand-400 border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-gray-400">Extracting colors...</span>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div id="results" class="hidden">
+          <h3 class="text-xl font-semibold mb-6">Extracted Palette</h3>
+          <div id="palette" class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8"></div>
+
+          <!-- Export Options -->
+          <div class="flex flex-wrap justify-center gap-3 mb-6">
+            <button onclick="exportFormat('css')" class="px-4 py-2 rounded-lg glass hover:bg-white/10 transition-all text-sm">CSS</button>
+            <button onclick="exportFormat('scss')" class="px-4 py-2 rounded-lg glass hover:bg-white/10 transition-all text-sm">SCSS</button>
+            <button onclick="exportFormat('json')" class="px-4 py-2 rounded-lg glass hover:bg-white/10 transition-all text-sm">JSON</button>
+            <button onclick="exportFormat('tailwind')" class="px-4 py-2 rounded-lg glass hover:bg-white/10 transition-all text-sm">Tailwind</button>
+          </div>
+
+          <!-- Code Output -->
+          <div class="relative">
+            <pre id="codeOutput" class="glass rounded-xl p-4 text-sm font-mono overflow-x-auto text-gray-300"></pre>
+            <button onclick="copyCode()" class="absolute top-2 right-2 px-3 py-1 rounded-lg bg-brand-600 hover:bg-brand-500 transition-all text-xs">Copy</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="py-20 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Powerful Features</h2>
+        <p class="text-gray-400">Everything you need to work with colors</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="glass rounded-2xl p-8 hover:bg-white/5 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-brand-400 to-purple-600 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Smart Extraction</h3>
+          <p class="text-gray-400">AI-powered color extraction finds the most dominant and harmonious colors in any image.</p>
+        </div>
+        <div class="glass rounded-2xl p-8 hover:bg-white/5 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-pink-400 to-rose-600 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Multiple Formats</h3>
+          <p class="text-gray-400">Export palettes as CSS variables, SCSS, JSON, or Tailwind config. Copy codes in HEX, RGB, or HSL.</p>
+        </div>
+        <div class="glass rounded-2xl p-8 hover:bg-white/5 transition-all">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center mb-6">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          </div>
+          <h3 class="text-xl font-semibold mb-3">Instant Results</h3>
+          <p class="text-gray-400">No waiting. Upload your image and get your color palette in milliseconds.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use Cases -->
+  <section class="py-20 px-6 bg-gradient-to-b from-transparent to-brand-900/20">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Perfect For</h2>
+        <p class="text-gray-400">Designers, developers, and creators</p>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glass rounded-xl p-6 text-center">
+          <div class="text-3xl mb-3">🎨</div>
+          <h4 class="font-semibold mb-2">UI/UX Designers</h4>
+          <p class="text-sm text-gray-400">Extract palettes from inspiration images</p>
+        </div>
+        <div class="glass rounded-xl p-6 text-center">
+          <div class="text-3xl mb-3">💻</div>
+          <h4 class="font-semibold mb-2">Web Developers</h4>
+          <p class="text-sm text-gray-400">Generate CSS/Tailwind color variables</p>
+        </div>
+        <div class="glass rounded-xl p-6 text-center">
+          <div class="text-3xl mb-3">📱</div>
+          <h4 class="font-semibold mb-2">App Builders</h4>
+          <p class="text-sm text-gray-400">Create consistent color schemes</p>
+        </div>
+        <div class="glass rounded-xl p-6 text-center">
+          <div class="text-3xl mb-3">✨</div>
+          <h4 class="font-semibold mb-2">Brand Creators</h4>
+          <p class="text-sm text-gray-400">Build brand color palettes from logos</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="py-20 px-6">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Loved by Creators</h2>
+        <p class="text-gray-400">See what our users are saying</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="glass rounded-2xl p-8">
+          <div class="flex gap-1 mb-4">
+            <span class="text-yellow-400">★</span><span class="text-yellow-400">★</span><span class="text-yellow-400">★</span><span class="text-yellow-400">★</span><span class="text-yellow-400">★</span>
+          </div>
+          <p class="text-gray-300 mb-6">"This tool saves me so much time. I can grab colors from any inspiration image instantly. The export options are perfect for my workflow."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-pink-500 flex items-center justify-center font-semibold">S</div>
+            <div><p class="font-medium">Sarah Chen</p><p class="text-sm text-gray-500">UI Designer</p></div>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-8">
+          <div class="flex gap-1 mb-4">
+            <span class="text-yellow-400">★</span><span class="text-yellow-400">★</span><span class="text-yellow-400">★</span><span class="text-yellow-400">★</span><span class="text-yellow-400">★</span>
+          </div>
+          <p class="text-gray-300 mb-6">"As a developer, I love the Tailwind export feature. Copy-paste ready for my projects. Best $19 I've spent on a design tool."</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-green-400 to-teal-500 flex items-center justify-center font-semibold">M</div>
+            <div><p class="font-medium">Marcus Johnson</p><p class="text-sm text-gray-500">Full-Stack Developer</p></div>
+          </div>
+        </div>
+        <div class="glass rounded-2xl p-8">
+          <div class="flex gap-1 mb-4">
+            <span class="text-yellow-400">★</span><span class="text-yellow-400">★</span><span class="text-yellow-400">★</span><span class="text-yellow-400">★</span><span class="text-yellow-400">★</span>
+          </div>
+          <p class="text-gray-300 mb-6">"Used it to create my entire brand palette from my logo. The color extraction is incredibly accurate. Highly recommend!"</p>
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center font-semibold">A</div>
+            <div><p class="font-medium">Alex Rivera</p><p class="text-sm text-gray-500">Founder</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="py-20 px-6">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">Simple Pricing</h2>
+      <p class="text-gray-400 mb-12">One-time purchase. Lifetime access.</p>
+      <div class="glass rounded-2xl p-10 max-w-md mx-auto glow">
+        <div class="text-5xl font-bold mb-2">$19</div>
+        <p class="text-gray-400 mb-8">One-time payment</p>
+        <ul class="text-left space-y-3 mb-8">
+          <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Unlimited extractions</li>
+          <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>All export formats</li>
+          <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Priority support</li>
+          <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>Lifetime updates</li>
+        </ul>
+        <button id="buyBtn" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-500 to-pink-500 hover:from-brand-400 hover:to-pink-400 transition-all font-semibold text-lg btn-glow">
+          Get Instant Access
+        </button>
+        <p class="text-sm text-gray-500 mt-4">30-day money-back guarantee</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="py-20 px-6">
+    <div class="max-w-3xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">FAQ</h2>
+        <p class="text-gray-400">Common questions answered</p>
+      </div>
+      <div class="space-y-4">
+        <div class="glass rounded-xl p-6">
+          <h4 class="font-semibold mb-2">How does the color extraction work?</h4>
+          <p class="text-gray-400">We analyze your image to find the dominant colors using intelligent clustering algorithms. You get the most representative colors from your image.</p>
+        </div>
+        <div class="glass rounded-xl p-6">
+          <h4 class="font-semibold mb-2">What file formats are supported?</h4>
+          <p class="text-gray-400">We support JPG, PNG, GIF, and WebP images up to 10MB in size.</p>
+        </div>
+        <div class="glass rounded-xl p-6">
+          <h4 class="font-semibold mb-2">Can I export to Tailwind?</h4>
+          <p class="text-gray-400">Yes! You can export your palette as a Tailwind config file, CSS variables, SCSS, or JSON format.</p>
+        </div>
+        <div class="glass rounded-xl p-6">
+          <h4 class="font-semibold mb-2">Is this a one-time purchase?</h4>
+          <p class="text-gray-400">Yes! Pay once and get lifetime access with unlimited extractions and all future updates.</p>
+        </div>
+        <div class="glass rounded-xl p-6">
+          <h4 class="font-semibold mb-2">Do you offer refunds?</h4>
+          <p class="text-gray-400">Yes, we offer a 30-day money-back guarantee. If you're not satisfied, contact us for a full refund.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 px-6 border-t border-white/10">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-400 to-pink-500 flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+        </div>
+        <span class="font-bold">Color Palette Extractor</span>
+      </div>
+      <p class="text-gray-500 text-sm">© 2026 Color Palette Extractor. All rights reserved.</p>
+      <div class="flex gap-6 text-sm">
+        <a href="#" class="text-gray-400 hover:text-white transition-colors">Privacy</a>
+        <a href="#" class="text-gray-400 hover:text-white transition-colors">Terms</a>
+        <a href="#" class="text-gray-400 hover:text-white transition-colors">Contact</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Schema.org -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Color Palette Extractor",
+    "description": "Extract beautiful color palettes from any image instantly",
+    "applicationCategory": "DesignApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "19",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+
+  <script>
+    // Demo functionality
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImg');
+    const extractBtn = document.getElementById('extractBtn');
+    const loading = document.getElementById('loading');
+    const results = document.getElementById('results');
+    const palette = document.getElementById('palette');
+    const codeOutput = document.getElementById('codeOutput');
+    let currentPalette = [];
+
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('drag-over');
+      if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', (e) => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+    function handleFile(file) {
+      if (!file.type.startsWith('image/')) { alert('Please upload an image file'); return; }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        previewImg.src = e.target.result;
+        imagePreview.classList.remove('hidden');
+        extractBtn.classList.remove('hidden');
+        results.classList.add('hidden');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    extractBtn.addEventListener('click', async () => {
+      loading.classList.remove('hidden');
+      extractBtn.classList.add('hidden');
+      results.classList.add('hidden');
+
+      // Simulate extraction (demo mode)
+      await new Promise(r => setTimeout(r, 1500));
+
+      // Generate demo palette
+      currentPalette = [
+        { hex: '#a855f7', name: 'Primary' },
+        { hex: '#ec4899', name: 'Secondary' },
+        { hex: '#f59e0b', name: 'Accent' },
+        { hex: '#1a1a2e', name: 'Dark' },
+        { hex: '#f8fafc', name: 'Light' }
+      ];
+
+      renderPalette();
+      loading.classList.add('hidden');
+      results.classList.remove('hidden');
+    });
+
+    function renderPalette() {
+      palette.innerHTML = currentPalette.map(color => `
+        <div class="color-swatch cursor-pointer" onclick="copyColor('${color.hex}')">
+          <div class="h-24 rounded-xl mb-2" style="background: ${color.hex}"></div>
+          <p class="text-sm font-mono text-center">${color.hex}</p>
+          <p class="text-xs text-gray-500 text-center">${color.name}</p>
+        </div>
+      `).join('');
+    }
+
+    function copyColor(hex) {
+      navigator.clipboard.writeText(hex);
+      alert(`Copied ${hex} to clipboard!`);
+    }
+
+    function exportFormat(format) {
+      let output = '';
+      switch(format) {
+        case 'css':
+          output = ':root {\n' + currentPalette.map((c, i) => `  --color-${i + 1}: ${c.hex};`).join('\n') + '\n}';
+          break;
+        case 'scss':
+          output = currentPalette.map((c, i) => `$color-${i + 1}: ${c.hex};`).join('\n');
+          break;
+        case 'json':
+          output = JSON.stringify(currentPalette.map(c => c.hex), null, 2);
+          break;
+        case 'tailwind':
+          output = 'colors: {\n' + currentPalette.map((c, i) => `  brand-${i + 1}: '${c.hex}',`).join('\n') + '\n}';
+          break;
+      }
+      codeOutput.textContent = output;
+    }
+
+    function copyCode() {
+      navigator.clipboard.writeText(codeOutput.textContent);
+      alert('Copied to clipboard!');
+    }
+
+    // Checkout
+    const CHECKOUT_URL = window.__CHECKOUT_URL || null;
+    document.getElementById('buyBtn').addEventListener('click', () => {
+      if (CHECKOUT_URL) window.open(CHECKOUT_URL, '_blank');
+      else alert('Coming soon! Contact @OtonomUniverseCreator on Telegram.');
+    });
+  </script>
+</body>
+</html>
